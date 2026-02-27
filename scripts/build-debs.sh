@@ -18,22 +18,23 @@ APT_REPO="${APT_REPO:-$(dirname "$SCRIPT_DIR")/apt-repo}"
 if [ "$REVISION" = "auto" ]; then
     MAX_REV=0
 
-    # Check APT repo for current published revision
+    # Check APT repo for current published revision of THIS version
     case "$VARIANT" in
         sky1) APT_COMPONENT="main" ;;
         *)    APT_COMPONENT="${VARIANT#sky1-}" ;;
     esac
     if [ -d "$APT_REPO" ] && command -v reprepro >/dev/null 2>&1; then
+        # Only match packages for the same kernel version (e.g., 6.19.4)
         APT_VER=$(cd "$APT_REPO" && reprepro -C "$APT_COMPONENT" list sid 2>/dev/null \
-            | grep "linux-image-sky1" | grep -v dbg | head -1 \
+            | grep "linux-image-${VERSION}" | grep -v dbg | head -1 \
             | grep -oE '[0-9]+$' || echo "0")
         if [ "$APT_VER" -gt "$MAX_REV" ] 2>/dev/null; then
             MAX_REV="$APT_VER"
         fi
     fi
 
-    # Check build directory for existing debs
-    for deb in "$SCRIPT_DIR/$WORK_DIR"/linux-image-*"${VARIANT}"*_*_arm64.deb; do
+    # Check build directory for existing debs matching THIS version
+    for deb in "$SCRIPT_DIR/$WORK_DIR"/linux-image-"${VERSION}"-"${VARIANT}"*_*_arm64.deb; do
         [ -f "$deb" ] || continue
         fname=$(basename "$deb")
         REV=$(echo "$fname" | sed -n 's/.*_\([0-9]\+\)_arm64\.deb$/\1/p')
