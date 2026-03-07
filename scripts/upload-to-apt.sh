@@ -176,9 +176,21 @@ if [ -n "$REPO_VER" ]; then
     fi
 fi
 
-# Remove old versions of same packages from this component
+# Remove old versioned kernel packages from this component.
+# When uploading .r2, we must also remove stale .r1 entries — the package names
+# differ (linux-image-X.Y.Z-sky1-latest.r1 vs .r2), so removing by exact name
+# from the upload set isn't enough.  Query reprepro for all versioned packages
+# matching this variant and remove them before adding the new set.
 echo ""
 echo "Removing old package versions from $COMPONENT..."
+OLD_PKGS=$(reprepro -C "$COMPONENT" list "$DIST" 2>/dev/null \
+    | awk '{print $2}' \
+    | grep -E "^linux-(image|headers)-[0-9].*${VARIANT}" || true)
+for pkg in $OLD_PKGS; do
+    echo "  Removing old: $pkg"
+    reprepro -C "$COMPONENT" remove "$DIST" "$pkg" 2>/dev/null || true
+done
+# Also remove meta packages by exact name from upload set (handles non-versioned names)
 for deb in $DEBS; do
     pkg=$(dpkg-deb -f "$deb" Package)
     echo "  Removing old: $pkg"
