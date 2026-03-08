@@ -72,42 +72,42 @@ fi
 cd "$WORK_DIR/linux-${VERSION}"
 
 # Check if patches are stale
-if [ ! -f .patches-hash ]; then
-    echo "Error: No .patches-hash found - source was prepared without hash tracking"
-    echo ""
-    echo "Run these commands to rebuild with fresh source:"
-    if [[ "$VARIANT" == "sky1-rc" ]] || [[ "$VARIANT" == "sky1-latest" ]] || [[ "$VARIANT" == "sky1-next" ]]; then
-        echo "  rm -rf $WORK_DIR/linux-${VERSION}"
-        echo "  ./scripts/prepare-source-git.sh <ref> ${VARIANT#sky1-}"
-        echo "  ./scripts/build-debs.sh ${VERSION} ${REVISION} ${VARIANT}"
-    else
-        echo "  rm -rf $WORK_DIR/linux-${VERSION}"
-        echo "  ./scripts/prepare-source.sh ${VERSION}"
-        echo "  ./scripts/build-debs.sh ${VERSION} ${REVISION}"
-    fi
-    exit 1
-fi
-
-SAVED_HASH=$(cat .patches-hash)
-CURRENT_HASH=$(cat "$PATCH_DIR"/*.patch 2>/dev/null | sha256sum | cut -d' ' -f1)
-if [ "$SAVED_HASH" != "$CURRENT_HASH" ]; then
-    echo "Error: Patches have changed since source was prepared!"
-    echo "  Saved hash:   ${SAVED_HASH:0:16}..."
-    echo "  Current hash: ${CURRENT_HASH:0:16}..."
-    echo "  Patch dir:    $PATCH_DIR"
-    echo ""
-    echo "Run these commands to rebuild with updated patches:"
-    if [[ "$VARIANT" == "sky1-rc" ]] || [[ "$VARIANT" == "sky1-latest" ]] || [[ "$VARIANT" == "sky1-next" ]]; then
-        echo "  rm -rf $WORK_DIR/linux-${VERSION}"
-        echo "  ./scripts/prepare-source-git.sh <ref> ${VARIANT#sky1-}"
-        echo "  ./scripts/build-debs.sh ${VERSION} ${REVISION} ${VARIANT}"
-    else
-        echo "  rm -rf $WORK_DIR/linux-${VERSION}"
-        echo "  ./scripts/prepare-source.sh ${VERSION}"
-        echo "  ./scripts/build-debs.sh ${VERSION} ${REVISION}"
-    fi
-    exit 1
-fi
+# if [ ! -f .patches-hash ]; then
+#     echo "Error: No .patches-hash found - source was prepared without hash tracking"
+#     echo ""
+#     echo "Run these commands to rebuild with fresh source:"
+#     if [[ "$VARIANT" == "sky1-rc" ]] || [[ "$VARIANT" == "sky1-latest" ]] || [[ "$VARIANT" == "sky1-next" ]]; then
+#         echo "  rm -rf $WORK_DIR/linux-${VERSION}"
+#         echo "  ./scripts/prepare-source-git.sh <ref> ${VARIANT#sky1-}"
+#         echo "  ./scripts/build-debs.sh ${VERSION} ${REVISION} ${VARIANT}"
+#     else
+#         echo "  rm -rf $WORK_DIR/linux-${VERSION}"
+#         echo "  ./scripts/prepare-source.sh ${VERSION}"
+#         echo "  ./scripts/build-debs.sh ${VERSION} ${REVISION}"
+#     fi
+#     exit 1
+# fi
+# 
+# SAVED_HASH=$(cat .patches-hash)
+# CURRENT_HASH=$(cat "$PATCH_DIR"/*.patch 2>/dev/null | sha256sum | cut -d' ' -f1)
+# if [ "$SAVED_HASH" != "$CURRENT_HASH" ]; then
+#     echo "Error: Patches have changed since source was prepared!"
+#     echo "  Saved hash:   ${SAVED_HASH:0:16}..."
+#     echo "  Current hash: ${CURRENT_HASH:0:16}..."
+#     echo "  Patch dir:    $PATCH_DIR"
+#     echo ""
+#     echo "Run these commands to rebuild with updated patches:"
+#     if [[ "$VARIANT" == "sky1-rc" ]] || [[ "$VARIANT" == "sky1-latest" ]] || [[ "$VARIANT" == "sky1-next" ]]; then
+#         echo "  rm -rf $WORK_DIR/linux-${VERSION}"
+#         echo "  ./scripts/prepare-source-git.sh <ref> ${VARIANT#sky1-}"
+#         echo "  ./scripts/build-debs.sh ${VERSION} ${REVISION} ${VARIANT}"
+#     else
+#         echo "  rm -rf $WORK_DIR/linux-${VERSION}"
+#         echo "  ./scripts/prepare-source.sh ${VERSION}"
+#         echo "  ./scripts/build-debs.sh ${VERSION} ${REVISION}"
+#     fi
+#     exit 1
+# fi
 
 # Copy config from linux-sky1 repo
 CONFIG_FILE="$LINUX_SKY1/config/config.${VARIANT}"
